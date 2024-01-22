@@ -13,7 +13,10 @@ const RegistrationForm = () => {
 
     const onFinish = async (values) => {
         try {
-            dispatch(fetchRegistration({username:values.username,password:values.password,email:values.email,birthDate:values.date.$d})).then(jump)
+            dispatch(fetchRegistration({username:values.username,
+                                        password:values.password,
+                                        email:values.email,
+                                        birthDate:values.date.$d})).then(jump)
         } catch (e) {
             alert(e || 'ERROR')
         }

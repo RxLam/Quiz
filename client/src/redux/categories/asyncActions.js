@@ -1,11 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import {API_URL} from "../../consts";
 import axios from 'axios'
 
 
 export const fetchGetCategories = createAsyncThunk (
     'categories/fetchGetCategories',
         async () => {
-            const { data } = await axios.get(`http://localhost:4000/categories`)
+            const { data } = await axios.get(`${API_URL}categories`)
             return data;
         }
 );
@@ -13,7 +14,7 @@ export const fetchGetCategories = createAsyncThunk (
 export const fetchGetCategoryByName = createAsyncThunk (
     'categories/fetchGetCategoryByName',
     async (name) => {
-        const { data } = await axios.get(`http://localhost:4000/categories/` + name)
+        const { data } = await axios.get(`${API_URL}categories/` + name)
         return data;
     }
 );
@@ -21,7 +22,7 @@ export const fetchGetCategoryByName = createAsyncThunk (
 export const fetchGetCategoryById = createAsyncThunk (
     'categories/fetchGetCategoryByName',
     async (id) => {
-        const { data } = await axios.get(`http://localhost:4000/categories/` + id)
+        const { data } = await axios.get(`${API_URL}categories/` + id)
         return data;
     }
 );
@@ -31,7 +32,7 @@ export const fetchPostCategories = createAsyncThunk (
     async (params) => {
         const { name, image } = params
 
-        const { data } = await axios.post('http://localhost:4000/categories', {
+        const { data } = await axios.post(`${API_URL}categories`, {
             name,
             image
         })
@@ -49,7 +50,7 @@ export const fetchDeleteCategoryByName = createAsyncThunk (
     'categories/fetchDeleteCategoryByName',
     async (params) => {
         const { name } = params
-        const { data } = await axios.delete('http://localhost:4000/categories/' + name, )
+        const { data } = await axios.delete(`${API_URL}categories/` + name, )
             .then((response) => {
                 alert(`Категория ${response} удалена`);
             })
@@ -63,7 +64,7 @@ export const fetchDeleteCategoryByName = createAsyncThunk (
 export const fetchDeleteAllCategories = createAsyncThunk (
     'categories/fetchDeleteAllCategories',
     async (params) => {
-        const { data } = await axios.delete('http://localhost:4000/categories', )
+        const { data } = await axios.delete(`${API_URL}categories`, )
             .then((response) => {
                 alert(`Все категории удалены`);
             })
@@ -79,7 +80,7 @@ export const fetchDeleteCategoryById = createAsyncThunk (
     async (params) => {
         const { id } = params
 
-        const { data } = await axios.delete('http://localhost:4000/categories/' + id, )
+        const { data } = await axios.delete(`${API_URL}categories/` + id, )
             .then((response) => {
                 alert(`Категория ${data} удалена`);
             })
@@ -95,7 +96,7 @@ export const fetchPutCategories = createAsyncThunk (
     async (params) => {
         const { id, name } = params
 
-        const { data } = await axios.put('http://localhost:4000/categories', {
+        const { data } = await axios.put(`${API_URL}categories`, {
             id,
             name,
         })

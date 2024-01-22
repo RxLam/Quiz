@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {useSelector} from "react-redux";
 import {useAppDispatch} from "../redux/store";
-import {selectFilteredQuestions, selectQuestionsData} from "../redux/questions/selectors";
+import {selectFilteredQuestions} from "../redux/questions/selectors";
 import {fetchGetQuestions} from "../redux/questions/asyncActions";
 
 

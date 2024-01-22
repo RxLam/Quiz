@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import { Input } from 'antd'
 import {useDispatch, useSelector} from "react-redux";
 import {categoriesActions} from '../redux/categories/slice'
-import {questionsActions} from "../redux/questions/slice";
 
 
 const Search = () => {
@@ -15,7 +14,6 @@ const Search = () => {
 
     useEffect(() => {
         dispatch(categoriesActions.searchByName(items))
-        // dispatch(questionsActions.searchByName(items))
     }, [items, dispatch])
 
     return (

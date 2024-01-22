@@ -1,11 +1,13 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import {API_URL} from "../../consts";
 import axios from 'axios'
+
 
 
 export const fetchGetQuestions = createAsyncThunk (
     'questions/fetchGetQuestions',
         async () => {
-            const { data } = await axios.get(`http://localhost:4000/questions`)
+            const { data } = await axios.get(`${API_URL}questions`)
             return data;
         }
 );
@@ -13,7 +15,7 @@ export const fetchGetQuestions = createAsyncThunk (
 export const fetchGetQuestionByName = createAsyncThunk (
     'categories/fetchGetQuestionByName',
     async (name) => {
-        const { data } = await axios.get(`http://localhost:4000/questions/` + name)
+        const { data } = await axios.get(`${API_URL}questions/` + name)
         return data;
     }
 );
@@ -23,7 +25,7 @@ export const fetchPostQuestions = createAsyncThunk (
     async (params) => {
         const { categoryId, questions } = params
 
-        const { data } = await axios.post('http://localhost:4000/questions', {
+        const { data } = await axios.post(`${API_URL}questions`, {
             categoryId,
             questions: [questions]
         })
@@ -42,7 +44,7 @@ export const fetchPutQuestions = createAsyncThunk (
     async (params) => {
         const { categoryId, questions } = params
         console.log(params)
-        const { data } = await axios.put('http://localhost:4000/questions' , {
+        const { data } = await axios.put(`${API_URL}questions` , {
             id: categoryId,
             questions: questions
         })
@@ -61,7 +63,7 @@ export const fetchDeleteQuestionByName = createAsyncThunk (
     async (params) => {
         const { name } = params
 
-        const { data } = await axios.delete('http://localhost:4000/questions/' + name, )
+        const { data } = await axios.delete(`${API_URL}questions/` + name, )
             .then((response) => {
                 console.log(`Вопрос: ${name} удален`);
             })
@@ -75,7 +77,7 @@ export const fetchDeleteQuestionByName = createAsyncThunk (
 export const fetchDeleteAllQuestions = createAsyncThunk (
     'questions/fetchDeleteAllQuestions',
     async () => {
-        const { data } = await axios.delete('http://localhost:4000/questions' )
+        const { data } = await axios.delete(`${API_URL}questions` )
             .then((response) => {
                 console.log(`Все вопросы удалены`);
             })
@@ -91,7 +93,7 @@ export const fetchDeleteQuestionsById = createAsyncThunk (
     async (params) => {
         const { id } = params
         console.log(id)
-        const { data } = await axios.delete('http://localhost:4000/questions/' + id)
+        const { data } = await axios.delete(`${API_URL}questions/` + id)
             .then((response) => {
                 alert(`Вопросы категории ${response} удалены`);
             })

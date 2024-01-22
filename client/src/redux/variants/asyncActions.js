@@ -1,11 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+import {API_URL} from "../../consts";
 import axios from 'axios'
 
 
 export const fetchGetVariants = createAsyncThunk (
     'variants/fetchGetVariants',
         async () => {
-            const { data } = await axios.get(`http://localhost:4000/variants`)
+            const { data } = await axios.get(`${API_URL}variants`)
             return data;
         }
 );
@@ -15,7 +16,7 @@ export const fetchPostVariants = createAsyncThunk (
     async (params) => {
         const { questionId ,variants, correct } = params
 
-        const { data } = await axios.post('http://localhost:4000/variants', {
+        const { data } = await axios.post(`${API_URL}variants`, {
             questionId,
             variants: variants.split(', '),
             correct,
@@ -35,7 +36,7 @@ export const fetchDelVariantsByRange = createAsyncThunk (
     async (params) => {
         const { id , from, to } = params
 
-        const { data } = await axios.put('http://localhost:4000/variants/' + id, {
+        const { data } = await axios.put(`${API_URL}variants/` + id, {
                 from,
                 to
             }).then((response) => {
@@ -51,7 +52,7 @@ export const fetchDelVariantsByRange = createAsyncThunk (
 export const fetchDeleteAllVariants = createAsyncThunk (
     'variants/fetchDeleteAllVariants',
     async () => {
-        const { data } = await axios.delete('http://localhost:4000/variants' )
+        const { data } = await axios.delete(`${API_URL}/variants` )
             .then((response) => {
                 console.log(`Все варианты удалены`);
             })
@@ -67,7 +68,7 @@ export const fetchAddVariants = createAsyncThunk (
     async (params) => {
         const { id, variants} = params
 
-        const { data } = await axios.put('http://localhost:4000/variants', {
+        const { data } = await axios.put(`${API_URL}variants`, {
             id,
             variants: variants.split(', ')
         })
@@ -86,7 +87,7 @@ export const fetchDeleteVariantsById = createAsyncThunk (
     async (params) => {
         const { id } = params
         console.log(id)
-        const { data } = await axios.delete('http://localhost:4000/variants/' + id)
+        const { data } = await axios.delete(`${API_URL}variants/` + id)
             .then((response) => {
                 alert(`Варианты вопроса ${response} удалены`);
             })
