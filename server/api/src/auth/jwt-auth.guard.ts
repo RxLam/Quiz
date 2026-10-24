@@ -1,28 +1,68 @@
-import {CanActivate, Injectable, UnauthorizedException, ExecutionContext} from '@nestjs/common'
-import {Observable} from 'rxjs'
-import {JwtService} from '@nestjs/jwt'
+import {
+    CanActivate,
+    ExecutionContext,
+    Injectable,
+    UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 
+export interface JwtUser {
+    id: number;
+    username: string;
+    email?: string;
+}
+
+export interface AuthenticatedRequest {
+    headers: {
+        authorization?: string;
+    };
+    user?: JwtUser;
+}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
-    constructor(private jwtService: JwtService) {}
+    constructor(private readonly jwtService: JwtService) {}
 
-    canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-        const req = context.switchToHttp().getRequest()
+    canActivate(context: ExecutionContext): boolean {
+        const request = context
+            .switchToHttp()
+            .getRequest<AuthenticatedRequest>();
+        const authorization = request.headers.authorization;
+        const [scheme, token, ...extraParts] = authorization?.trim().split(/\s+/) ?? [];
+
+        if (
+            scheme?.toLowerCase() !== 'bearer' ||
+            !token ||
+            extraParts.length > 0
+        ) {
+            throw new UnauthorizedException({
+                message: 'Пользователь не авторизован',
+            });
+        }
+
         try {
-            const authHeader = req.headers.authorization
-            const bearer = authHeader.split(' ')[0]
-            const token = authHeader.split(' ')[1]
+            const payload = this.jwtService.verify<JwtUser>(token);
 
-            if (bearer !== 'Bearer' || !token) {
-                throw new UnauthorizedException({message:'Пользователь не авторизован'})
+            if (
+                !payload ||
+                typeof payload.id !== 'number' ||
+                typeof payload.username !== 'string'
+            ) {
+                throw new Error('JWT payload is missing required user claims');
             }
 
-            const user = this.jwtService.verify(token)
-            req.user = user
-            return true
-        } catch (e) {
-            throw new UnauthorizedException({message:'Пользователь не авторизован'})
+            // Expose only the claims the application needs, not other token data.
+            request.user = {
+                id: payload.id,
+                username: payload.username,
+                ...(typeof payload.email === 'string' ? { email: payload.email } : {}),
+            };
+
+            return true;
+        } catch {
+            throw new UnauthorizedException({
+                message: 'Пользователь не авторизован',
+            });
         }
     }
 }

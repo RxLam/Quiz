@@ -1,18 +1,25 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import {API_URL} from "../../consts";
 import axios from 'axios'
 
+const showRequestError = (error) => {
+    const responseMessage = error.response?.data?.message;
+    const message = Array.isArray(responseMessage)
+        ? responseMessage.join(', ')
+        : responseMessage || error.message || 'Не удалось выполнить запрос';
+    alert(`Произошла ошибка: ${message}`);
+    throw error;
+}
 
 export const fetchRegistration = createAsyncThunk (
     'user/fetchRegistration',
         async ({username, password, email, birthDate}) => {
         console.log('regData', username)
-            const { data } = await axios.post(`${API_URL}user/registration`, {
+            const { data } = await axios.post(`http://localhost:4000/user/registration`, {
                 username,
                 password,
                 email,
                 birthDate
-            }).catch((error) => { alert( `Произошла ошибка ${error.response.data.message}`)});
+            }).catch(showRequestError);
             return data
         }
 );
@@ -20,10 +27,10 @@ export const fetchRegistration = createAsyncThunk (
 export const fetchLogin = createAsyncThunk (
     'user/fetchLogin',
     async ({username, password}) => {
-        const { data } = await axios.post(`${API_URL}user/login`, {
+        const { data } = await axios.post(`http://localhost:4000/user/login`, {
             username,
             password
-        }).catch((error) => alert( `Произошла ошибка ${error.response.data.message}`))
+        }).catch(showRequestError)
         return data
     }
 );
@@ -31,8 +38,8 @@ export const fetchLogin = createAsyncThunk (
 
 export const fetchGetUserData = createAsyncThunk (
     'user/fetchGetUserData',
-    async ({username}) => {
-        const { data } = await axios.get(`${API_URL}user/` + username).catch((error) => { alert( `Произошла ошибка ${error.response.data.message}`)});
+    async () => {
+        const { data } = await axios.get(`http://localhost:4000/user/me`).catch((error) => { alert( `Произошла ошибка ${error.response.data.message}`)});
         console.log(data)
         return data
     }
@@ -40,11 +47,9 @@ export const fetchGetUserData = createAsyncThunk (
 
 
 export const fetchAddScores = createAsyncThunk (
-    'user/fetchGetUserData',
-    async ({username, scores}) => {
-        console.log('addScoresData', username, scores)
-        const { data } = await axios.post(`${API_URL}user/addScores`, {
-            username,
+    'user/fetchAddScores',
+    async ({scores}) => {
+        const { data } = await axios.post(`http://localhost:4000/user/addScores`, {
             scores
         }).catch((error) => { alert( `Произошла ошибка ${error.response.data.message}`)});
         return data
@@ -52,12 +57,10 @@ export const fetchAddScores = createAsyncThunk (
 );
 
 export const fetchDeleteScores = createAsyncThunk (
-    'user/fetchGetUserData',
-    async ({username}) => {
-        console.log('deleteScoresData', username)
-        const { data } = await axios.put(`${API_URL}user/deleteScores`, {
-            username
-        }).catch((error) => { alert( `Произошла ошибка ${error.response.data.message}`)});
+    'user/fetchDeleteScores',
+    async () => {
+        const { data } = await axios.put(`http://localhost:4000/user/deleteScores`, {})
+            .catch((error) => { alert( `Произошла ошибка ${error.response.data.message}`)});
         return data
     }
 );

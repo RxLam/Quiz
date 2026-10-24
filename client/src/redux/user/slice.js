@@ -11,6 +11,18 @@ const initialState = {
     status: null // loading | success | error
 }
 
+const saveSession = (state, payload) => {
+    if (!payload?.token) {
+        state.status = 'ERROR';
+        return;
+    }
+
+    const { username } = jwt_decode(payload.token);
+    localStorage.setItem('token', payload.token);
+    localStorage.setItem('username', username);
+    state.status = 'SUCCESS';
+}
+
 const userSlice = createSlice({
     name: 'user',
     initialState,
@@ -25,10 +37,7 @@ const userSlice = createSlice({
         });
         builder.addCase(fetchRegistration.fulfilled, (state, action) => {
             state.userInfo = action.payload
-            console.log(action.payload)
-            const username = jwt_decode(action.payload.token).username
-            localStorage.setItem('username', username)
-            state.status = 'SUCCESS';
+            saveSession(state, action.payload);
         });
         builder.addCase(fetchRegistration.rejected, (state, action) => {
             state.status = 'ERROR';
@@ -39,9 +48,7 @@ const userSlice = createSlice({
             state.status = 'LOADING';
         });
         builder.addCase(fetchLogin.fulfilled, (state, action) => {
-            const username = jwt_decode(action.payload.token).username
-            localStorage.setItem('username', username)
-            state.status = 'SUCCESS';
+            saveSession(state, action.payload);
         });
         builder.addCase(fetchLogin.rejected, (state, action) => {
             state.status = 'ERROR';

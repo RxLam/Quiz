@@ -1,24 +1,26 @@
-import { forwardRef, Module } from '@nestjs/common';
-// import { AuthController } from './auth.controller';
-// import { AuthService } from './auth.service';
-import { UsersModule } from '../users/users.module'
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
+const jwtSecret = process.env.PRIVATE_KEY;
+
+if (!jwtSecret || jwtSecret.length < 32) {
+    throw new Error('PRIVATE_KEY must be set to a secret of at least 32 characters');
+}
 
 @Module({
-    controllers: [],
-    providers: [],
+    providers: [JwtAuthGuard],
     imports: [
-        forwardRef(() => UsersModule),
         JwtModule.register({
-            secret: process.env.PRIVATE_KEY || 'azaza',
+            secret: jwtSecret,
             signOptions: {
                 expiresIn: '24h'
             }
         })
     ],
     exports: [
-        JwtModule
+        JwtModule,
+        JwtAuthGuard,
     ]
 })
 export class AuthModule {}

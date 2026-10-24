@@ -8,23 +8,22 @@ import {selectUserData} from "../redux/user/selectors";
 
 const Profile = () => {
     const dispatch = useDispatch()
-    const username = localStorage.getItem('username')
     const userData = useSelector(selectUserData)
 
     useEffect(() => {
-        dispatch(fetchGetUserData({username}))
-    }, [])
+        dispatch(fetchGetUserData())
+    }, [dispatch])
 
-   const refreshAllScores = () => {
-        dispatch(fetchDeleteScores({username}))
-        document.location.reload()
+   const refreshAllScores = async () => {
+        await dispatch(fetchDeleteScores())
+        await dispatch(fetchGetUserData())
    }
 
     const items = [
         {
             key: '1',
             label: 'Username',
-            children: username,
+            children: userData.userInfo.username,
         },
         {
             key: '2',

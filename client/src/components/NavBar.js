@@ -14,7 +14,6 @@ const items = [
 		),
 		key: 'main',
 		icon: <AppstoreOutlined />,
-
 	},
 ];
 
@@ -51,6 +50,7 @@ const NavBar = () => {
 
 	const logOut = () => {
 		localStorage.removeItem('username')
+		localStorage.removeItem('token')
 		navigate(LOGIN_ROUTE)
 	}
 

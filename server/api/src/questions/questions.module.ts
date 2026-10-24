@@ -5,6 +5,7 @@ import {SequelizeModule} from "@nestjs/sequelize";
 import {Questions} from "./questions.model";
 import {Variants} from "../variants/variants.model";
 import {VariantsModule} from "../variants/variants.module";
+import {AuthModule} from "../auth/auth.module";
 
 
 @Module({
@@ -12,7 +13,8 @@ import {VariantsModule} from "../variants/variants.module";
     controllers: [QuestionsController],
     imports: [
         SequelizeModule.forFeature([Questions, Variants]),
-        VariantsModule
+        VariantsModule,
+        AuthModule,
     ],
     exports: [
         QuestionsService

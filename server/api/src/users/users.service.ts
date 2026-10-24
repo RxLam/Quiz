@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, ConflictException, HttpException, HttpStatus } from '@nestjs/common';
 import {CreateUserDto} from "./dto/create-user.dto";
 import {InjectModel} from "@nestjs/sequelize"
 import {User} from "./users.model";
@@ -15,19 +15,27 @@ export class UsersService {
     constructor(@InjectModel(User) private usersRepository, private jwtService: JwtService) {}
 
     async registration(userDto: CreateUserDto) {
+        const candidateByName = await this.usersRepository.findOne({where: {username: userDto.username}})
+        const candidateByEmail = await this.usersRepository.findOne({where: {email: userDto.email}})
+
+        if (candidateByName || candidateByEmail) {
+            throw new ConflictException('Пользователь с таким логином или email уже существует')
+        }
+
+        const hashPassword = await bcryptjs.hash(userDto.password, 10)
         try {
-            const candidateByName = await this.usersRepository.findOne({where: {username: userDto.username}})
-            const candidateByEmail = await this.usersRepository.findOne({where: {email: userDto.email}})
-
-            if(candidateByName || candidateByEmail) return new UnauthorizedException('Пользователь с таким логином уже существует')
-
-            else {
-                const hashPassword = await bcryptjs.hash(userDto.password, 3)
-                const user = await this.usersRepository.create({username:userDto.username,password:hashPassword,email:userDto.email,birthDate:userDto.birthDate})
-                return this.generateToken(user)
+            const user = await this.usersRepository.create({
+                username: userDto.username,
+                password: hashPassword,
+                email: userDto.email,
+                birthDate: userDto.birthDate,
+            })
+            return this.generateToken(user)
+        } catch (error) {
+            if (error?.name === 'SequelizeUniqueConstraintError') {
+                throw new ConflictException('Пользователь с таким логином или email уже существует')
             }
-        }  catch(e) {
-            throw new HttpException('Пользователь с таким логином уже существует', HttpStatus.NOT_FOUND)
+            throw error
         }
     }
 
@@ -78,8 +86,7 @@ export class UsersService {
                 username: user.username,
                 email: user.email,
                 birthDate: user.birthDate.replace(/T\.?.+/, ''),
-                scores: user.scores,
-                password: user.password
+                scores: user.scores
             }
         }
         catch(e) {
@@ -88,7 +95,7 @@ export class UsersService {
     }
 
     private async generateToken(user: User) {
-        const payload = {id: user.id, username: user.username, email: user.email, password: user.password}
+        const payload = {id: user.id, username: user.username, email: user.email}
 
         return {
             token: this.jwtService.sign(payload)

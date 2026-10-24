@@ -13,18 +13,20 @@ const RegistrationForm = () => {
 
     const onFinish = async (values) => {
         try {
-            dispatch(fetchRegistration({username:values.username,
-                                        password:values.password,
-                                        email:values.email,
-                                        birthDate:values.date.$d})).then(jump)
+            const result = await dispatch(fetchRegistration({
+                username: values.username,
+                password: values.password,
+                email: values.email,
+                birthDate: values.date.format('YYYY-MM-DD'),
+            }));
+
+            if (fetchRegistration.fulfilled.match(result) && result.payload?.token) {
+                navigate(MAIN_ROUTE);
+            }
         } catch (e) {
             alert(e || 'ERROR')
         }
     };
-
-    const jump = () => {
-        if(localStorage.getItem('username')) navigate(MAIN_ROUTE)
-    }
 
     return (
         <>
@@ -56,7 +58,11 @@ const RegistrationForm = () => {
                 >
                     <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email" />
                 </Form.Item>
-                <Form.Item name="date" label="Birth Date" >
+                <Form.Item
+                    name="date"
+                    label="Birth Date"
+                    rules={[{ required: true, message: 'Please select your birth date!' }]}
+                >
                     <DatePicker
                         disabledDate={(current) => moment()  < current}
                     />

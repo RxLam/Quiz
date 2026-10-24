@@ -1,16 +1,17 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {fetchAddScores} from "../redux/user/asyncActions";
 import {useDispatch} from "react-redux";
 
 
 const Result = ({matches, total}) => {
 	const dispatch = useDispatch()
-	const username = localStorage.getItem('username')
+	const token = localStorage.getItem('token')
 
-	const addScores = () => {
-		dispatch(fetchAddScores({username, scores: matches}))
-	}
-	addScores()
+	useEffect(() => {
+		if (token) {
+			dispatch(fetchAddScores({scores: matches}))
+		}
+	}, [dispatch, matches, token])
 
 	return (
 		<div>
